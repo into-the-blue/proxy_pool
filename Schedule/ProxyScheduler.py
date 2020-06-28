@@ -35,7 +35,7 @@ class DoFetchProxy(ProxyManager):
         self.fetch()
         self.log.info("finish fetch proxy")
 
-@timeout(60*5,use_signals=False)
+@timeout(60*10,use_signals=False)
 def rawProxyScheduler():
     DoFetchProxy().main()
     doRawProxyCheck()
@@ -52,13 +52,13 @@ def usefulProxyScheduler():
 
 
 def runScheduler():
-    rawProxyScheduler()
+    tryRawProxyScheduler()
     usefulProxyScheduler()
 
     scheduler_log = LogHandler("scheduler_log")
     scheduler = BlockingScheduler(logger=scheduler_log)
 
-    scheduler.add_job(tryRawProxyScheduler, 'interval', minutes=5, id="raw_proxy_check", name="raw_proxy定时采集")
+    scheduler.add_job(tryRawProxyScheduler, 'interval', minutes=10, id="raw_proxy_check", name="raw_proxy定时采集")
     scheduler.add_job(usefulProxyScheduler, 'interval', minutes=5, id="useful_proxy_check", name="useful_proxy定时检查")
 
     scheduler.start()
